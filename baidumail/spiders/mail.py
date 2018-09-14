@@ -59,7 +59,7 @@ class MailSpider(scrapy.Spider):
         if next is not None:
             next_url = self.handle_school_next_url(next.get('href'))
             if next_url.find('tag') < 1:
-                next_url.replace('ie=utf-8&tab=good', 'ie=utf-8&tab=good')
+                next_url.replace('ie=utf-8', 'ie=utf-8&tab=good')
             yield scrapy.Request(url='http:' + next_url, callback=self.parse_jingpin)
 
     def parse_page_info(self, response):
@@ -88,3 +88,4 @@ class MailSpider(scrapy.Spider):
     def get_soup(self, response):
         html = response.text
         return BeautifulSoup(html, 'lxml')
+
