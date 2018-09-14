@@ -39,7 +39,10 @@ class MailSpider(scrapy.Spider):
         bas = soup.select('p.ba_name')
         schools = list(map(lambda sh: sh.get_text(), bas))
         for school in schools:
-            yield scrapy.Request(url=self.enter_school.format(school, '0'), callback=self.parse_jingpin)
+            url = self.enter_school.format(school, '0')
+            if url.find('tag') < 1:
+                url.replace('ie=utf-8', 'ie=utf-8&tab=good')
+            yield scrapy.Request(url=url, callback=self.parse_jingpin)
         next = soup.select_one('div.pagination > a.next')
         if next is not None:
             yield scrapy.Request(url=self.start_urls[0] + self.handle_school_next_url(next.get('href')),
@@ -66,7 +69,7 @@ class MailSpider(scrapy.Spider):
         soup = self.get_soup(response)
         # 正则匹配全文,获取邮箱和qq号
         text = soup.select_one('html').text.strip().replace('\n', '')
-        #ba = soup.select_one('div.card_title > a').text.strip()
+        # ba = soup.select_one('div.card_title > a').text.strip()
         datas = []
         emails = self.mail_pat.findall(text)
         qqs = self.qq_pat.findall(text)
@@ -88,4 +91,3 @@ class MailSpider(scrapy.Spider):
     def get_soup(self, response):
         html = response.text
         return BeautifulSoup(html, 'lxml')
-
